@@ -29,4 +29,9 @@ To run all examples:
 cd $GOPATH/src/github.com/winlinvip/go-speex && go test ./...
 ```
 
+For more information about SPEEX codec, read:
+
+* [github.com](https://github.com/winlinvip/speex), source code of speex codec.
+* [examples](http://www.speex.org/docs/manual/speex-manual/node13.html), encoder and decoder example.
+
 Winlin 2016
