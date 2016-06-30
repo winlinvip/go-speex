@@ -32,6 +32,7 @@ cd $GOPATH/src/github.com/winlinvip/go-speex && go test ./...
 There are an example of SPEEX audio packets in FLV:
 
 * [avatar speex over FLV](doc/speex_data.go), user can use this file to decode to PCM.
+* [audio resample](https://github.com/winlinvip/go-aresample).
 
 For more information about SPEEX codec, read:
 
