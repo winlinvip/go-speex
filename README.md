@@ -15,7 +15,7 @@ Then, compile the speex:
 ```
 cd $GOPATH/src/github.com/winlinvip/go-speex &&
 git clone https://github.com/winlinvip/speex.git &&
-cd speex/ && ./configure --prefix=`pwd`/objs --enable-static && make && make install &&
+cd speex/ && bash autogen.sh && ./configure --prefix=`pwd`/objs --enable-static && make && make install &&
 cd ..
 ```
 
