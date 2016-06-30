@@ -24,7 +24,7 @@ package speex
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../speex-lib/objs/include
-#cgo LDFLAGS: ${SRCDIR}/../speex-lib/objs/lib/libspeex.a
+#cgo LDFLAGS: ${SRCDIR}/../speex-lib/objs/lib/libspeex.a -lm
 #include "speex/speex.h"
 
 typedef struct {
@@ -166,7 +166,7 @@ func (v *SpeexDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	// so we alloc the output to frame_size*2.
 	nbPcmBytes := v.FrameSize()*2
 
-	pcm = make([]byte, nbPcmBytes, nbPcmBytes)
+	pcm = make([]byte, nbPcmBytes)
 	pPcm := (*C.char)(unsafe.Pointer(&pcm[0]))
 	pNbPcm := C.int(nbPcmBytes)
 
