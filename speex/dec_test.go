@@ -20,16 +20,16 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // @remark we must use another packet for utest, because the cgo will dup symbols.
-package dec_test
+package speex_test
 
 import (
 	"testing"
-	"github.com/winlinvip/go-speex/dec"
+	"github.com/winlinvip/go-speex/speex"
 )
 
 func TestSpeexInit(t *testing.T) {
 	var err error
-	d := dec.NewSpeexDecoder()
+	d := speex.NewSpeexDecoder()
 	if err = d.Init(16000, 1); err != nil {
 		t.Error("init decoder failed, err is", err)
 		return

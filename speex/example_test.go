@@ -19,16 +19,16 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package dec_test
+package speex_test
 
 import (
 	"fmt"
-	"github.com/winlinvip/go-speex/dec"
+	"github.com/winlinvip/go-speex/speex"
 )
 
 func ExampleSpeexDecoder() {
 	var err error
-	d := dec.NewSpeexDecoder()
+	d := speex.NewSpeexDecoder()
 	if err = d.Init(16000, 1); err != nil {
 		fmt.Println("init decoder failed, err is", err)
 		return

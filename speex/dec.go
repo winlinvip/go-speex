@@ -20,11 +20,11 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // The speex decoder, to decode the encoded speex frame to PCM samples.
-package dec
+package speex
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../speex/objs/include
-#cgo LDFLAGS: ${SRCDIR}/../speex/objs/lib/libspeex.a
+#cgo CFLAGS: -I${SRCDIR}/../speex-lib/objs/include
+#cgo LDFLAGS: ${SRCDIR}/../speex-lib/objs/lib/libspeex.a
 #include "speex/speex.h"
 
 typedef struct {
@@ -190,4 +190,8 @@ func (v *SpeexDecoder) FrameSize() int {
 
 func (v *SpeexDecoder) SampleRate() int {
 	return int(C.speexdec_sample_rate(&v.m))
+}
+
+func (v *SpeexDecoder) Channels() int {
+	return 1
 }

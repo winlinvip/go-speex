@@ -2,7 +2,7 @@
 package main
 
 import (
-	_ "github.com/winlinvip/go-speex/dec"
+	_ "github.com/winlinvip/go-speex/speex"
 )
 
 func main() {
