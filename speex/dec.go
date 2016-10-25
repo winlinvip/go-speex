@@ -92,13 +92,18 @@ void speexdec_close(speexdec_t* h) {
 	h->state = 0;
 }
 
-int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pnb_pcm) {
+
+int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pnb_pcm, int* isDone) {
 	// the output pcm must equals to the frames(each is 16bits).
 	if (*pnb_pcm != h->frame_size * sizeof(spx_int16_t)) {
 		return -1;
 	}
-
-	speex_bits_read_from(&h->bits, frame, nb_frame);
+	
+	if (speex_bits_remaining(&h->bits) < 5 ||
+		speex_bits_peek_unsigned(&h->bits, 5) == 0xF) {
+		
+		speex_bits_read_from(&h->bits, frame, nb_frame);
+	}
 
 	spx_int16_t* output = (spx_int16_t*)pcm;
 	int ret = speex_decode_int(h->state, &h->bits, output);
@@ -111,6 +116,12 @@ int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pn
 	if (ret == -1) {
 		*pnb_pcm = 0;
 		return 0;
+	}
+
+	if (speex_bits_remaining(&h->bits) < 5 &&
+		speex_bits_peek_unsigned(&h->bits, 5) == 0xF) {
+		
+		*isDone = 1;
 	}
 
 	return 0;
@@ -129,6 +140,7 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+	"bytes"
 )
 
 type SpeexDecoder struct {
@@ -161,26 +173,37 @@ func (v *SpeexDecoder) Close() {
 func (v *SpeexDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	p := (*C.char)(unsafe.Pointer(&frame[0]))
 	pSize := C.int(len(frame))
-
-	// each sample is 16bits(2bytes),
-	// so we alloc the output to frame_size*2.
-	nbPcmBytes := v.FrameSize()*2
-
-	pcm = make([]byte, nbPcmBytes)
-	pPcm := (*C.char)(unsafe.Pointer(&pcm[0]))
-	pNbPcm := C.int(nbPcmBytes)
-
-	r := C.speexdec_decode(&v.m, p, pSize, pPcm, &pNbPcm)
-	if int(r) != 0 {
-		return nil,fmt.Errorf("decode failed, err=%v", int(r))
+	
+	pIsDone := C.int(0)
+	
+	var result bytes.Buffer
+	
+	for {
+		if pIsDone == 1 {
+			break
+		}
+		// each sample is 16bits(2bytes),
+		// so we alloc the output to frame_size*2.
+		nbPcmBytes := v.FrameSize()*2
+		
+		pcmTmp := make([]byte, nbPcmBytes)
+		pPcm := (*C.char)(unsafe.Pointer(&pcmTmp[0]))
+		pNbPcm := C.int(nbPcmBytes)
+		
+		r := C.speexdec_decode(&v.m, p, pSize, pPcm, &pNbPcm, &pIsDone)
+		if int(r) != 0 {
+			return nil,fmt.Errorf("decode failed, err=%v", int(r))
+		}
+		if int(pNbPcm) <= 0 {
+			return nil,nil
+		}
+		if int(pNbPcm) != nbPcmBytes {
+			return nil,fmt.Errorf("invalid pcm size %v", int(pNbPcm))
+		}
+		result.Write(pcmTmp)
 	}
-	if int(pNbPcm) <= 0 {
-		return nil,nil
-	}
-	if int(pNbPcm) != nbPcmBytes {
-		return nil,fmt.Errorf("invalid pcm size %v", int(pNbPcm))
-	}
-
+	pcm = result.Bytes()
+	
 	return
 }
 
