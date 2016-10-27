@@ -92,8 +92,7 @@ void speexdec_close(speexdec_t* h) {
 	h->state = 0;
 }
 
-
-int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pnb_pcm, int* isDone) {
+int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pnb_pcm, int* is_done) {
 	// the output pcm must equals to the frames(each is 16bits).
 	if (*pnb_pcm != h->frame_size * sizeof(spx_int16_t)) {
 		return -1;
@@ -101,7 +100,6 @@ int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pn
 	
 	if (speex_bits_remaining(&h->bits) < 5 ||
 		speex_bits_peek_unsigned(&h->bits, 5) == 0xF) {
-		
 		speex_bits_read_from(&h->bits, frame, nb_frame);
 	}
 
@@ -118,10 +116,9 @@ int speexdec_decode(speexdec_t* h, char* frame, int nb_frame, char* pcm, int* pn
 		return 0;
 	}
 
-	if (speex_bits_remaining(&h->bits) < 5 &&
+	if (speex_bits_remaining(&h->bits) < 5 ||
 		speex_bits_peek_unsigned(&h->bits, 5) == 0xF) {
-		
-		*isDone = 1;
+		*is_done = 1;
 	}
 
 	return 0;
@@ -175,7 +172,7 @@ func (v *SpeexDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	pSize := C.int(len(frame))
 	
 	pIsDone := C.int(0)
-	
+
 	var result bytes.Buffer
 	
 	for {
