@@ -191,8 +191,9 @@ func (v *SpeexDecoder) Decode(frame []byte) (pcm []byte, err error) {
 		if int(r) != 0 {
 			return nil,fmt.Errorf("decode failed, err=%v", int(r))
 		}
-		if int(pNbPcm) <= 0 {
-			return nil,nil
+		// if pNbPcm is 0, which means the stream is end, need to jump out of cycle.
+		if int(pNbPcm) == 0 {
+			break
 		}
 		if int(pNbPcm) != nbPcmBytes {
 			return nil,fmt.Errorf("invalid pcm size %v", int(pNbPcm))
